@@ -85,4 +85,3 @@ window.onload = () => {
     localStorage.setItem("contObj", JSON.stringify(contObj))
   }
 }
-
