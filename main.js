@@ -1,3 +1,4 @@
+
 let cont = document.querySelector('.cont')
 let input = document.querySelector('#input')
 let btn = document.querySelector('.btn')
@@ -5,20 +6,67 @@ let contItem = document.querySelectorAll('.cont-item')
 let contItemText = document.querySelectorAll('.cont-item-text')
 let num = 0
 
-let contObj = []
+// let contObj
+function getObj() {
+  if (Object.keys(localStorage).includes("contObj")) {
+    contObj = JSON.parse(localStorage.getItem("contObj"))
+    for (var i = 0; i < contObj.length; i++) {
+      console.log(contObj[i])
+      cont.innerHTML += `
+        <div class="cont-item">
+          <div class="cont-item-text">${contObj[i].text}</div>
+          <div class="cont-item-time"></div>
+        </div>
+      `
+    }
+  } else {
+    let contObj = []
+    localStorage.setItem("contObj", JSON.stringify(contObj))
+  }
+  return contObj
+}
+
+window.onload = getObj()
 
 function setCont() {
   cont.innerHTML += `
     <div class="cont-item">
       <div class="cont-item-text">${contObj[contObj.length - 1].text}</div>
-      <div class="cont-item-time"></div>
+      <div class="cont-item-time">just now</div>
     </div>
   `
+  input.value = ''
 }
-  let interval = setInterval(() => {
+
+document.addEventListener('keydown', e => {
+  switch (e.key) {
+    case 'Enter':
+      setCont()
+      break;
+  }
+})
+
+btn.addEventListener('click', () => {
+  let tempArr = []
+  let clickTime = new Date()
+  let obj = new Object()
+  obj.id = num
+  obj.time = Math.floor(clickTime.getTime()/1000)
+  obj.text = input.value
+  tempArr.push(obj)
+  contObj = contObj.concat(tempArr)
+  num++
+  tempArr = []
+  setCont()
+  
+  localStorage.setItem("contObj", JSON.stringify(contObj))
+})
+
+
+let interval = setInterval(() => {
   let contItemTime = document.querySelectorAll('.cont-item-time')
-  clickT = new Date()
-  let t = Math.floor(clickT.getTime()/1000)
+  let currTime = new Date()
+  let t = Math.floor(currTime.getTime()/1000)
   
   for (let i = 0; i < contItemTime.length; i++) {
     let timeDiff = t - contObj[i].time
@@ -54,34 +102,3 @@ function setCont() {
 }, 1000)
 
 
-btn.addEventListener('click', () => {
-  clickTime = new Date()
-  obj = new Object()
-  obj.id = num
-  obj.time = Math.floor(clickTime.getTime()/1000)
-  obj.text = input.value
-  contObj[num] = obj
-  
-  num++
-  
-  setCont()
-  
-  input.value = ''
-  localStorage.setItem("contObj", JSON.stringify(contObj))
-})
-
-window.onload = () => {
-  if (Object.keys(localStorage).includes("contObj")) {
-    contObj = JSON.parse(localStorage.getItem("contObj"))
-    for (var i = 0; i < contObj.length; i++) {
-      cont.innerHTML += `
-        <div class="cont-item">
-          <div class="cont-item-text">${contObj[i].text}</div>
-          <div class="cont-item-time"></div>
-        </div>
-      `
-    }
-  } else {
-    localStorage.setItem("contObj", JSON.stringify(contObj))
-  }
-}
