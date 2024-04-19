@@ -1,26 +1,33 @@
+// localStorage.clear()
+
+console.log(Object.keys(localStorage))
 
 let cont = document.querySelector('.cont')
 let input = document.querySelector('#input')
 let btn = document.querySelector('.btn')
 let contItem = document.querySelectorAll('.cont-item')
 let contItemText = document.querySelectorAll('.cont-item-text')
+let contObj
 let num = 0
 
 // let contObj
 function getObj() {
   if (Object.keys(localStorage).includes("contObj")) {
     contObj = JSON.parse(localStorage.getItem("contObj"))
-    for (var i = 0; i < contObj.length; i++) {
-      console.log(contObj[i])
-      cont.innerHTML += `
-        <div class="cont-item">
-          <div class="cont-item-text">${contObj[i].text}</div>
-          <div class="cont-item-time"></div>
-        </div>
-      `
+    if (contObj.length > 0) {
+      for (var i = 0; i < contObj.length; i++) {
+        console.log(contObj[i])
+        cont.innerHTML += `
+          <div class="cont-item">
+            <div class="cont-item-text">${contObj[i].text}</div>
+            <div class="cont-item-time"></div>
+          </div>
+        `
+      }
     }
   } else {
-    let contObj = []
+    console.log(Object.keys(localStorage))
+    contObj = []
     localStorage.setItem("contObj", JSON.stringify(contObj))
   }
   return contObj
@@ -29,13 +36,27 @@ function getObj() {
 window.onload = getObj()
 
 function setCont() {
+  let tempArr = []
+  let clickTime = new Date()
+  let obj = new Object()
+  obj.id = num
+  obj.time = Math.floor(clickTime.getTime() / 1000)
+  obj.text = input.value
+  tempArr.push(obj)
+  contObj = contObj.concat(tempArr)
+  console.log('contObj.pop()')
+  num++
+  
   cont.innerHTML += `
     <div class="cont-item">
-      <div class="cont-item-text">${contObj[contObj.length - 1].text}</div>
+      <div class="cont-item-text">${tempArr[0].text}</div>
       <div class="cont-item-time">just now</div>
     </div>
   `
+  tempArr = []
   input.value = ''
+  
+  localStorage.setItem("contObj", JSON.stringify(contObj))
 }
 
 document.addEventListener('keydown', e => {
@@ -46,22 +67,7 @@ document.addEventListener('keydown', e => {
   }
 })
 
-btn.addEventListener('click', () => {
-  let tempArr = []
-  let clickTime = new Date()
-  let obj = new Object()
-  obj.id = num
-  obj.time = Math.floor(clickTime.getTime()/1000)
-  obj.text = input.value
-  tempArr.push(obj)
-  contObj = contObj.concat(tempArr)
-  num++
-  tempArr = []
-  setCont()
-  
-  localStorage.setItem("contObj", JSON.stringify(contObj))
-})
-
+btn.addEventListener('click', setCont)
 
 let interval = setInterval(() => {
   let contItemTime = document.querySelectorAll('.cont-item-time')
